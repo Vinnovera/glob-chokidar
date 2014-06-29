@@ -1,6 +1,6 @@
 {
   "name": "glob-chokidar",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Glob based Chokidar",
   "main": "index.js",
   "dependencies": {

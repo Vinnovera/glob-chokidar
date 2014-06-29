@@ -4,7 +4,7 @@ var chokidar        = require('chokidar'),
 	path            = require('path'),
 	EventEmitter    = require('events').EventEmitter;
 
-module.exports = function(glob, opts, cb) {
+module.exports = function(globs, opts, cb) {
 	var defaults    = {
 			ignored:        [],
 			ignoreInitial:  true,
@@ -19,7 +19,18 @@ module.exports = function(glob, opts, cb) {
 	var out         = new EventEmitter();
 
 	/* Figure out where to put the watcher */
-	var watchDir    = path.dirname(glob).replace(/\*+.*/, '');
+	var watchDirs   = [];
+
+	if (typeof globs == 'object') {
+		watchDirs = globs.map(parseWatchPath)
+	}
+	else {
+		watchDirs.push(parseWatchPath(globs));
+	}
+
+	function parseWatchPath(glob) {
+		return path.dirname(glob).replace(/\*+.*/, '');
+	}
 
 	if (typeof opts === 'function') {
 		cb = opts;
@@ -33,10 +44,10 @@ module.exports = function(glob, opts, cb) {
 		return globule.isMatch(ignored, path);
 	};
 
-	var watcher = chokidar.watch(watchDir, opts);
+	var watcher = chokidar.watch(watchDirs, opts);
 
 	function onChange(event, path){
-		if (globule.isMatch(glob, path)) {
+		if (globule.isMatch(globs, path)) {
 			if (opts.batch) {
 				batchChange(event, path);
 			}
